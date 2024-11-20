@@ -1,6 +1,6 @@
 ### 如何在C++中实现一个线程安全的单例模式
 
- **1. 【非线程安全的单例模式】** 
+ **1. 【非线程安全的单例模式】**
 
 ```
 class Singleton
@@ -28,7 +28,7 @@ private:
 Singleton* Singleton::instance = nullptr;
 ```
 
- **2. 【使用互斥锁(Mutex)实现线程安全的单例模式】** 
+ **2. 【使用互斥锁(Mutex)实现线程安全的单例模式】**
 
 ```
 #include <mutex>
@@ -60,7 +60,7 @@ Singleton* Singleton::instance = nullptr;
 std::mutex Singleton::mutex_;
 ```
 
- **3. 【使用双重检查锁(Double-Checked Locking)实现线程安全的单例模式】** 
+ **3. 【使用双重检查锁(Double-Checked Locking)实现线程安全的单例模式】**
 
 ```
 #include <mutex>
@@ -98,7 +98,7 @@ Singleton* Singleton::instance = nullptr;
 std::mutex Singleton::mutex_;
 ```
 
- **4. 【使用静态局部变量(C++11起)实现线程安全的单例模式】** 
+ **4. 【使用静态局部变量(C++11起)实现线程安全的单例模式】**
 
 ```
 class Singleton
@@ -121,7 +121,7 @@ private:
 };
 ```
 
- **5. 【使用智能指针和call_once(C++11起)实现线程安全的单例模式】** 
+ **5. 【使用智能指针和call_once(C++11起)实现线程安全的单例模式】**
 
 ```
 #include <mutex>
@@ -156,4 +156,58 @@ private:
 // 初始化
 std::shared_ptr<Singleton> Singleton::instance = nullptr;
 std::once_flag Singleton::init_flag;
+```
+
+```
+#include <iostream>
+#include <memory>
+#include <stdlib.h>
+
+class Singleton
+{
+public:
+	// 获取Singleton类的唯一实例
+	static Singleton& getInstance()
+	{
+		// 静态局部变量instance在首次调用getInstance时初始化
+		static Singleton instance;
+		return instance;
+	}
+
+	// 删除复制构造函数和赋值操作符，防止复制单例对象
+	Singleton(const Singleton&) = delete;
+	Singleton& operator=(const Singleton&) = delete;
+
+private:
+	// 私有构造函数，防止外部通过new操作符创建对象
+	Singleton()
+	{
+		std::cout << "Singleton class created." << std::endl;
+	}
+
+	// 静态私有成员变量，用于保存唯一实例
+	static Singleton instance;
+};
+
+// 初始化静态成员变量
+Singleton Singleton::instance;
+
+int main()
+{
+	Singleton& singleton1 = Singleton::getInstance();
+	Singleton& singleton2 = Singleton::getInstance();
+
+	// 比较两个引用是否指向同一实例
+	if (&singleton1 == &singleton2)
+	{
+		std::cout << "Both instances are the same." << std::endl;
+	}
+	else
+	{
+		std::cout << "Instances are different." << std::endl;
+	}
+
+	system("pause");
+	return 0;
+}
 ```
